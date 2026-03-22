@@ -9,64 +9,186 @@
   <link rel="stylesheet" href="/css/style.css">
 </head>
 <body>
+  <!-- Loading Overlay for Model Downloads -->
+  <div id="loadingOverlay" class="loading-overlay" aria-label="Loading AI models" role="status">
+    <div class="loading-container">
+      <div class="loading-spinner" aria-hidden="true"></div>
+      <h2 class="loading-title">Loading AI Models</h2>
+      <div class="progress-container">
+        <div id="progressBar" class="progress-bar-fill" style="width: 0%"></div>
+      </div>
+      <p id="loadingStatus" class="loading-status">Initializing models...</p>
+      <p class="loading-note">First time setup: ~3-5 minutes<br>Models will be cached for future use</p>
+    </div>
+  </div>
+
   <div class="app-container">
-    <header>
-      <h1>Vision Assistant</h1>
-      <p class="subtitle">AI-powered environmental awareness</p>
+    <!-- Header -->
+    <header class="header" role="banner">
+      <div class="header-content">
+        <h1 class="app-title">Vision Assistant</h1>
+        <p class="app-subtitle">AI-Powered Environmental Awareness</p>
+        <div class="privacy-badge" aria-label="Privacy: All processing is local">
+          🔒 100% Offline & Private
+        </div>
+      </div>
     </header>
 
-    <main>
-      <!-- Camera Preview -->
-      <div class="camera-container">
-        <video id="cameraPreview" autoplay playsinline muted></video>
-        <canvas id="overlayCanvas" class="overlay-canvas"></canvas>
-        <div id="cameraStatus" class="camera-status">Initializing camera...</div>
-      </div>
-
-      <!-- Model Loading Status -->
-      <div id="modelStatus" class="model-status hidden">
-        <div class="status-card">
-          <h3>Loading AI Models</h3>
-          <div class="progress-bar">
-            <div id="modelProgress" class="progress-fill"></div>
+    <main class="main-content">
+      <!-- Camera Preview Area -->
+      <div class="camera-section">
+        <div class="camera-container">
+          <video id="cameraPreview" class="camera-preview" autoplay playsinline muted aria-label="Camera preview feed"></video>
+          <canvas id="overlayCanvas" class="overlay-canvas" aria-hidden="true"></canvas>
+          <div id="cameraStatus" class="camera-status" role="status" aria-live="polite">
+            Initializing camera...
           </div>
-          <p id="modelStatusText">Downloading models...</p>
-          <p class="model-info">First time setup may take 3-5 minutes depending on connection</p>
         </div>
       </div>
 
-      <!-- Controls -->
-      <div class="controls">
-        <button id="autoModeBtn" class="btn btn-primary" aria-label="Start auto detection mode">
-          <span class="btn-icon">🎯</span>
-          Start Auto Mode
+      <!-- Mode Selection - Large Toggle Buttons -->
+      <div class="mode-selector" role="group" aria-label="Mode selection">
+        <button id="autoModeBtn" class="mode-btn mode-auto" aria-label="Auto mode - continuous detection" role="switch" aria-checked="false">
+          <span class="mode-icon">🎯</span>
+          <span class="mode-label">Auto Mode</span>
+          <span class="mode-description">Continuous scene analysis</span>
         </button>
-        
-        <button id="queryModeBtn" class="btn btn-secondary" aria-label="Ask a question about what you see">
-          <span class="btn-icon">🎤</span>
-          Ask Question
-        </button>
-        
-        <button id="stopAudioBtn" class="btn btn-outline" aria-label="Stop current audio output">
-          <span class="btn-icon">🔇</span>
-          Stop Audio
+        <button id="queryModeBtn" class="mode-btn mode-query" aria-label="Query mode - ask questions" role="switch" aria-checked="false">
+          <span class="mode-icon">🎤</span>
+          <span class="mode-label">Query Mode</span>
+          <span class="mode-description">Ask about what you see</span>
         </button>
       </div>
 
-      <!-- Status and Feedback -->
-      <div class="feedback-area">
-        <div id="statusMessage" class="status-message" aria-live="polite">
-          Ready. Click "Start Auto Mode" for continuous detection or "Ask Question" to speak.
+      <!-- Status Panel -->
+      <div class="status-panel" role="region" aria-label="Current status">
+        <div class="current-mode">
+          <span class="status-label">Current Mode:</span>
+          <span id="currentMode" class="mode-indicator mode-idle" aria-live="polite">Idle</span>
         </div>
-        <div id="detectionLog" class="detection-log" aria-live="assertive"></div>
+        <div class="last-detection">
+          <span class="status-label">Last Detection:</span>
+          <div id="lastDetection" class="detection-text" aria-live="assertive">
+            Ready. Select a mode to begin.
+          </div>
+          <div id="statusMessage" class="status-message" role="status" aria-live="polite"></div>
+        </div>
+        <div id="autoModeStatus" class="auto-mode-status hidden" aria-live="polite">
+          <span class="status-icon">🔄</span>
+          <span>Auto mode active - Analyzing scene...</span>
+        </div>
       </div>
 
-      <!-- Privacy Notice -->
-      <footer class="privacy-notice">
-        <p>🔒 All processing happens locally on your device. No data leaves your computer.</p>
-        <p>📷 Camera access required for real-time assistance</p>
+      <!-- Main Action Button (Dynamic) -->
+      <div class="action-section">
+        <button id="mainActionBtn" class="action-btn" aria-label="Activate current mode">
+          <span id="actionIcon" class="action-icon">🎯</span>
+          <span id="actionText" class="action-text">Start Auto Mode</span>
+        </button>
+        <button id="stopAudioBtn" class="stop-audio-btn" aria-label="Stop all audio output">
+          <span class="stop-icon">🔇</span>
+          <span class="stop-text">Stop Audio</span>
+        </button>
+      </div>
+
+      <!-- Voice Input Indicator (Shows during query mode) -->
+      <div id="voiceIndicator" class="voice-indicator hidden" role="status" aria-live="polite">
+        <div class="voice-wave">
+          <span></span><span></span><span></span><span></span>
+        </div>
+        <p class="voice-text">Listening... Speak now</p>
+        <button id="cancelVoiceBtn" class="cancel-voice-btn" aria-label="Cancel voice input">Cancel</button>
+      </div>
+
+      <!-- Detection Log / Conversation History -->
+      <div class="log-section" role="region" aria-label="Activity log">
+        <h2 class="log-title">Activity Log</h2>
+        <div id="detectionLog" class="detection-log" aria-live="polite">
+          <div class="log-entry system">✓ System ready. Models will load automatically.</div>
+          <div class="log-entry system">📷 Camera access required for assistance</div>
+        </div>
+        <button id="clearLogBtn" class="clear-log-btn" aria-label="Clear activity log">Clear Log</button>
+      </div>
+
+      <!-- Footer -->
+      <footer class="footer" role="contentinfo">
+        <div class="footer-content">
+          <div class="footer-status">
+            <span id="connectionStatus" class="status-dot online" aria-label="Status: Online"></span>
+            <span>All processing is local • No data leaves your device</span>
+          </div>
+          <div class="footer-links">
+            <button id="privacyInfoBtn" class="footer-link" aria-label="Privacy information">Privacy</button>
+            <span class="footer-separator">•</span>
+            <button id="helpBtn" class="footer-link" aria-label="Help">Help</button>
+          </div>
+        </div>
       </footer>
     </main>
+  </div>
+
+  <!-- Privacy Modal (Hidden by default) -->
+  <div id="privacyModal" class="modal hidden" role="dialog" aria-label="Privacy information" aria-modal="true">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>Privacy & Data Security</h2>
+        <button class="modal-close" aria-label="Close modal">✕</button>
+      </div>
+      <div class="modal-body">
+        <p><strong>🔒 Your privacy is guaranteed:</strong></p>
+        <ul>
+          <li>All AI models run locally in your browser</li>
+          <li>Camera images never leave your device</li>
+          <li>Voice queries are processed offline</li>
+          <li>No cloud APIs or external servers</li>
+          <li>No tracking or analytics</li>
+          <li>Models are cached in IndexedDB</li>
+        </ul>
+        <p><strong>📊 Data Storage:</strong></p>
+        <ul>
+          <li>Models: ~475MB (downloaded once)</li>
+          <li>Settings: Local browser storage</li>
+          <li>No data uploaded anywhere</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- Help Modal (Hidden by default) -->
+  <div id="helpModal" class="modal hidden" role="dialog" aria-label="Help information" aria-modal="true">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>How to Use Vision Assistant</h2>
+        <button class="modal-close" aria-label="Close modal">✕</button>
+      </div>
+      <div class="modal-body">
+        <h3>🎯 Auto Mode</h3>
+        <p>Press "Start Auto Mode" for continuous scene analysis. The assistant will describe what it sees every few seconds, helping you navigate your environment.</p>
+        
+        <h3>🎤 Query Mode</h3>
+        <p>Press "Ask Question" to speak a question about your surroundings. Examples:</p>
+        <ul>
+          <li>"What's in front of me?"</li>
+          <li>"Is there any obstacle?"</li>
+          <li>"What color is this?"</li>
+          <li>"Can you read this text?"</li>
+        </ul>
+        
+        <h3>🔊 Audio Controls</h3>
+        <p>Use "Stop Audio" to interrupt speech at any time.</p>
+        
+        <h3>📱 Accessibility</h3>
+        <p>All buttons are large and work with screen readers. The interface uses high contrast colors for better visibility.</p>
+        
+        <h3>⚡ Performance Tips</h3>
+        <ul>
+          <li>Ensure good lighting for better detection</li>
+          <li>Keep device steady when asking questions</li>
+          <li>Models need ~500MB free space</li>
+          <li>Chrome 124+ recommended for best performance</li>
+        </ul>
+      </div>
+    </div>
   </div>
 
   <script type="module" src="/js/app.js"></script>
