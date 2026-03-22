@@ -30,11 +30,21 @@ An offline-first web application that uses on-device AI to help visually impaire
 - At least 4GB RAM recommended
 - 500MB free storage for models
 
-## Setup Instructions
 
-### Installation
+## Folder Structure
 
-1. Clone the repository:
-```bash
-git clone https://github.com/Shruti1315/EcoSight-web.git
-cd vision-assistant-web
+EcoSight/
+├── index.html          # Main HTML
+├── css/
+│   └── style.css       # Styling
+├── js/
+│   ├── app.js          # Main app logic
+│   ├── camera.js       # Camera handling
+│   ├── ai-service.js   # AI model integration
+│   ├── audio.js        # Speech I/O
+│   └── utils.js        # Helpers
+├── public/
+│   └── icons/          # App icons
+├── package.json
+├── vite.config.js
+└── README.md

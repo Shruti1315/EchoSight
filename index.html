@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+  <meta name="description" content="AI-powered vision assistant for visually impaired people - real-time object detection and voice queries, fully offline">
+  <title>Vision Assistant - AI for Visually Impaired</title>
+  <link rel="icon" type="image/svg+xml" href="/icons/icon.svg">
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <div class="app-container">
+    <header>
+      <h1>Vision Assistant</h1>
+      <p class="subtitle">AI-powered environmental awareness</p>
+    </header>
+
+    <main>
+      <!-- Camera Preview -->
+      <div class="camera-container">
+        <video id="cameraPreview" autoplay playsinline muted></video>
+        <canvas id="overlayCanvas" class="overlay-canvas"></canvas>
+        <div id="cameraStatus" class="camera-status">Initializing camera...</div>
+      </div>
+
+      <!-- Model Loading Status -->
+      <div id="modelStatus" class="model-status hidden">
+        <div class="status-card">
+          <h3>Loading AI Models</h3>
+          <div class="progress-bar">
+            <div id="modelProgress" class="progress-fill"></div>
+          </div>
+          <p id="modelStatusText">Downloading models...</p>
+          <p class="model-info">First time setup may take 3-5 minutes depending on connection</p>
+        </div>
+      </div>
+
+      <!-- Controls -->
+      <div class="controls">
+        <button id="autoModeBtn" class="btn btn-primary" aria-label="Start auto detection mode">
+          <span class="btn-icon">🎯</span>
+          Start Auto Mode
+        </button>
+        
+        <button id="queryModeBtn" class="btn btn-secondary" aria-label="Ask a question about what you see">
+          <span class="btn-icon">🎤</span>
+          Ask Question
+        </button>
+        
+        <button id="stopAudioBtn" class="btn btn-outline" aria-label="Stop current audio output">
+          <span class="btn-icon">🔇</span>
+          Stop Audio
+        </button>
+      </div>
+
+      <!-- Status and Feedback -->
+      <div class="feedback-area">
+        <div id="statusMessage" class="status-message" aria-live="polite">
+          Ready. Click "Start Auto Mode" for continuous detection or "Ask Question" to speak.
+        </div>
+        <div id="detectionLog" class="detection-log" aria-live="assertive"></div>
+      </div>
+
+      <!-- Privacy Notice -->
+      <footer class="privacy-notice">
+        <p>🔒 All processing happens locally on your device. No data leaves your computer.</p>
+        <p>📷 Camera access required for real-time assistance</p>
+      </footer>
+    </main>
+  </div>
+
+  <script type="module" src="/js/app.js"></script>
+</body>
+</html>
